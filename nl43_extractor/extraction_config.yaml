@@ -1,0 +1,31 @@
+# ============================================================
+# NL-43 Extraction Pipeline Configuration
+# Edit this file before running: python3 pipeline.py
+# ============================================================
+
+base_path: "/Users/pulkit/Desktop/Forms"
+
+fiscal_years:
+  - FY2025
+  - FY2026
+
+quarters: all
+
+master_sheet_path: "/Users/pulkit/Desktop/Forms/NL43_Master.xlsx"
+processed_log_path: "/Users/pulkit/Desktop/Forms/.NL43_processed_log.json"
+
+# 'dynamic' = auto-detect NL-43 section in consolidated PDFs
+# 'skip'    = ignore consolidated PDFs
+consolidated_mode: dynamic
+
+nl43_keywords:
+  - "NL-43"
+  - "RURAL & SOCIAL"
+  - "POLICIES ISSUED"
+  - "PREMIUM COLLECTED"
+
+# TOC pages match at most 2 keywords; real form pages match 3+
+nl43_keyword_min_matches: 3
+
+# Per-company hard page overrides (optional, 1-indexed)
+nl43_page_overrides: {}
