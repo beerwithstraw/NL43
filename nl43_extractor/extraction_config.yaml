@@ -36,11 +36,5 @@ nl43_keyword_min_matches: 3
 # min_matches: raise threshold to skip TOC pages that already match the global minimum.
 # start/end: hard 1-indexed page override (bypasses keyword detection entirely).
 nl43_page_overrides:
-  magma_general:
-    min_matches: 5   # TOC matches 3; real form (p54) matches 5
-  iffco_tokio:
-    min_matches: 5   # TOC matches 3; real form (p81) matches 5
-  new_india:
-    min_matches: 5   # TOC matches 3; real form detected at wrong page
-  indusind_general:
-    min_matches: 5   # TOC matches 3; real form detected at wrong page
+  care_health:
+    min_matches: 2   # NL-43 page omits "RURAL & SOCIAL" phrase; only NL-43 + SUM ASSURED visible
