@@ -162,6 +162,30 @@ DEDICATED_PARSER: dict = {
 # These LOBs will be SKIPPED in the COMPLETENESS check (no WARN or FAIL).
 # ---------------------------------------------------------------------------
 COMPLETENESS_IGNORE: dict = {
-    # Bajaj Allianz: Motor OD rows are blank in NL-43 (no rural/social OD exposure).
-    "bajaj_allianz": {"motor_od"},
+    # Bajaj Allianz: Motor OD blank — no rural/social OD exposure.
+    "bajaj_allianz":       {"motor_od"},
+    # Health-only insurers: fire and motor LOBs are not applicable.
+    "aditya_birla_health": {"fire", "motor_od", "motor_tp"},
+    "care_health":         {"fire", "motor_od", "motor_tp"},
+    "galaxy_health":       {"fire", "motor_od", "motor_tp"},
+    "manipal_cigna":       {"fire", "motor_od", "motor_tp"},
+    "narayana_health":     {"fire", "motor_od", "motor_tp"},
+    "niva_bupa":           {"fire", "motor_od", "motor_tp"},
+    # AIC: agriculture insurer — fire, motor and health are not applicable.
+    "aic":                 {"fire", "motor_od", "motor_tp", "health"},
+    # General insurers with confirmed nil rural/social data for these LOBs (verified from PDF).
+    "acko":                {"fire", "motor_od", "motor_tp", "health"},
+    "shriram_general":     {"fire", "motor_od", "motor_tp", "health"},
+    "navi_general":        {"fire", "motor_od", "motor_tp", "health"},
+    "indusind_general":    {"fire", "motor_od", "motor_tp", "health"},
+}
+
+# ---------------------------------------------------------------------------
+# Total-sum ignore: (metric, segment) pairs to skip the TOTAL_SUM check for
+# a company. Use when the PDF itself documents why the sum won't reconcile.
+# ---------------------------------------------------------------------------
+TOTAL_SUM_IGNORE: dict = {
+    # Magma: Motor Comprehensive (174,666) is counted in both Motor OD and Motor TP
+    # but only once in the Total Rural row — documented in PDF footnote.
+    "magma_general": {("policies_issued", "rural")},
 }

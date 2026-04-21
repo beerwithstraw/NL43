@@ -28,13 +28,42 @@ from extractor.normaliser import clean_number, normalise_text
 
 logger = logging.getLogger(__name__)
 
-# Column indices for the three metrics (0-based in pdfplumber table)
+# Default column indices (0-based). Used when no header row is detected.
 # Col 0: Sl.No.  Col 1: LOB  Col 2: Particular  Col 3: Policies  Col 4: Premium  Col 5: Sum Assured
-_METRIC_COL_MAP = {
+_DEFAULT_LOB_COL = 1
+_DEFAULT_PARTICULAR_COL = 2
+_DEFAULT_METRIC_COL_MAP = {
     3: "policies_issued",
     4: "premium_collected",
     5: "sum_assured",
 }
+
+
+def _detect_column_layout(table):
+    """
+    Scan the first few rows for a header containing 'PARTICULAR'.
+    Returns (lob_col, particular_col, metric_col_map).
+    Falls back to defaults when no header is found.
+    """
+    for row in table[:6]:
+        if not row:
+            continue
+        upper = [str(c or "").upper().strip() for c in row]
+        if "PARTICULAR" not in upper:
+            continue
+        particular_col = upper.index("PARTICULAR")
+        lob_col = particular_col - 1
+        metric_col_map = {}
+        for i, cell in enumerate(upper):
+            if "POLICIES" in cell:
+                metric_col_map[i] = "policies_issued"
+            elif "PREMIUM" in cell:
+                metric_col_map[i] = "premium_collected"
+            elif "SUM" in cell:
+                metric_col_map[i] = "sum_assured"
+        if metric_col_map:
+            return lob_col, particular_col, metric_col_map
+    return _DEFAULT_LOB_COL, _DEFAULT_PARTICULAR_COL, _DEFAULT_METRIC_COL_MAP
 
 
 def _resolve_lob(raw_label: str, company_key: str):
@@ -56,22 +85,24 @@ def _extract_table(table, company_key: str, period_data: PeriodData) -> int:
       Row A: [Sl.No, LOB_name, "Rural", policies, premium, sum_assured]
       Row B: [None,  None,     "Social", policies, premium, sum_assured]
 
-    We track `current_lob` across rows; segment is determined from col 2.
+    Column positions are auto-detected from the header row to handle PDFs
+    where an extra leading column shifts everything right (e.g. Aditya Birla).
 
     Returns number of LOB keys extracted.
     """
+    lob_col, particular_col, metric_col_map = _detect_column_layout(table)
     current_lob = None
     lobs_found = 0
 
     for row in table:
-        if not row or len(row) < 3:
+        if not row or len(row) <= particular_col:
             continue
 
-        lob_label = row[1]
-        particular = normalise_text(str(row[2] or ""))
+        lob_label = row[lob_col] if lob_col < len(row) else None
+        particular = normalise_text(str(row[particular_col] or ""))
 
-        # Update current LOB when col 1 has a LOB name
-        if lob_label and lob_label.strip():
+        # Update current LOB when the LOB column has a LOB name
+        if lob_label and str(lob_label).strip():
             candidate = _resolve_lob(lob_label, company_key)
             if candidate is not None:
                 current_lob = candidate
@@ -87,7 +118,7 @@ def _extract_table(table, company_key: str, period_data: PeriodData) -> int:
         if current_lob not in period_data.data:
             period_data.data[current_lob] = {}
 
-        for col_idx, metric_key in _METRIC_COL_MAP.items():
+        for col_idx, metric_key in metric_col_map.items():
             if col_idx >= len(row):
                 continue
             val = clean_number(row[col_idx])

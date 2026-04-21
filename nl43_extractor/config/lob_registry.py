@@ -72,6 +72,7 @@ LOB_ALIASES = {
     "weather / crop insurance":                                 "crop_insurance",
     "other segment (a)":                                        "other_segments",
     "other segments (a)":                                       "other_segments",
+    "other segment (crop)":                                     "other_segments",
     "other segments":                                           "other_segments",
     "miscellaneous":                                            "total_miscellaneous",
     "others":                                                   "total_miscellaneous",

@@ -14,7 +14,7 @@ from dataclasses import dataclass, asdict
 from extractor.models import CompanyExtract, PeriodData
 from config.lob_registry import LOB_ORDER
 from config.row_registry import ROW_ORDER
-from config.company_registry import COMPLETENESS_IGNORE
+from config.company_registry import COMPLETENESS_IGNORE, TOTAL_SUM_IGNORE
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +102,8 @@ def _check_total_sum(
     segment: str,
 ) -> Optional[ValidationResult]:
     """TOTAL_SUM: sum of component LOBs ≈ grand_total for the given metric+segment."""
+    if (metric, segment) in TOTAL_SUM_IGNORE.get(exc.company_key, set()):
+        return None
     total_data = period_data.data.get("grand_total", {})
     total_val = _get_val(total_data, metric, segment)
     if total_val is None:

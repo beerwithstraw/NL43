@@ -21,11 +21,26 @@ consolidated_mode: dynamic
 nl43_keywords:
   - "NL-43"
   - "RURAL & SOCIAL"
-  - "POLICIES ISSUED"
-  - "PREMIUM COLLECTED"
+  - "SUM ASSURED"       # table header — reliably extracted even from columnar PDFs
+  - "LINE OF BUSINESS"  # table header — not present in TOC pages
+  - "NO. OF POLICIES"   # table header — partial match covers split "POLICIES ISSUED"
+  - "POLICIES ISSUED"   # exact match when pdfplumber joins columns
+  - "PREMIUM COLLECTED" # exact match when pdfplumber joins columns
 
-# TOC pages match at most 2 keywords; real form pages match 3+
+# TOC pages match 2 (NL-43 + RURAL & SOCIAL); real form pages match 3+.
+# Table-header keywords (SUM ASSURED, LINE OF BUSINESS) anchor detection
+# for companies where POLICIES ISSUED / PREMIUM COLLECTED are split by columns.
 nl43_keyword_min_matches: 3
 
-# Per-company hard page overrides (optional, 1-indexed)
-nl43_page_overrides: {}
+# Per-company overrides (optional).
+# min_matches: raise threshold to skip TOC pages that already match the global minimum.
+# start/end: hard 1-indexed page override (bypasses keyword detection entirely).
+nl43_page_overrides:
+  magma_general:
+    min_matches: 5   # TOC matches 3; real form (p54) matches 5
+  iffco_tokio:
+    min_matches: 5   # TOC matches 3; real form (p81) matches 5
+  new_india:
+    min_matches: 5   # TOC matches 3; real form detected at wrong page
+  indusind_general:
+    min_matches: 5   # TOC matches 3; real form detected at wrong page

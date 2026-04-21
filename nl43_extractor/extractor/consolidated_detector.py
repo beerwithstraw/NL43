@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 DEFAULT_KEYWORDS = [
     "NL-43",
     "RURAL & SOCIAL",
-    "POLICIES ISSUED",       # column header on the actual data table
-    "PREMIUM COLLECTED",     # column header on the actual data table
+    "SUM ASSURED",     # always in the data table header; split column text prevents
+                       # matching "POLICIES ISSUED" / "PREMIUM COLLECTED" across companies
 ]
 
 # TOC pages match at most 2 keywords; the real form page matches 3+.
