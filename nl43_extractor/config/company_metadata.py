@@ -207,6 +207,12 @@ COMPANY_METADATA = {
         "sector": "SAHI",
         "competitors": "Others",
     },
+    "galaxy_health": {
+        "company_name": "GALAXY_HEALTH",
+        "sorted_company": "33-GALAXY_HEALTH",
+        "sector": "SAHI",
+        "competitors": "Others",
+    },
 }
 
 def get_metadata(company_key: str) -> dict:
