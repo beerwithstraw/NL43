@@ -11,23 +11,29 @@ build/
 venv/
 env/
 
-# Input PDFs (source data — not committed)
-nl43_extractor/inputs/
+# Test / coverage
+.coverage
+.pytest_cache/
+htmlcov/
 
-# Local test inputs (kept on disk, never committed)
-test_inputs/
+# Input PDFs (source data — not committed)
+inputs/
+*_extract_*.pdf
 
 # Output files (generated)
-nl43_extractor/outputs/
+outputs/
 *.xlsx
 *.csv
 *.json
-
-# Logs
 *.log
+
+# Editor
+*.code-workspace
+.vscode/
+.idea/
 
 # macOS
 .DS_Store
 
-# Claude
-.claude/worktrees/
+# Claude Code
+.claude/
