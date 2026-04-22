@@ -99,7 +99,8 @@ def _resolve_quarters(quarters_config) -> List[str]:
 
 
 
-def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str]]:
+
+def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str], List[str]]:
     base_path = config.get("base_path", "").strip()
     fiscal_years = config.get("fiscal_years", [])
     quarters = _resolve_quarters(config.get("quarters", "all"))
@@ -111,6 +112,7 @@ def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str]]:
 
     results: List[ScanResult] = []
     unrecognized: List[str] = []
+    redundant: List[str] = []
 
     for fy in fiscal_years:
         fy_path = os.path.join(base_path, str(fy))
@@ -163,6 +165,7 @@ def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str]]:
                         continue
                     company_key, company_raw = result
                     if company_key in direct_companies:
+                        redundant.append(os.path.abspath(os.path.join(consol_path, fname)))
                         continue
                     pdf_path = os.path.join(consol_path, fname)
                     results.append(ScanResult(
@@ -176,5 +179,5 @@ def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str]]:
                         file_hash=_file_hash(pdf_path),
                     ))
 
-    logger.info(f"Scan complete: {len(results)} PDFs found")
-    return results, unrecognized
+    logger.info(f"Scan complete: {len(results)} detected, {len(unrecognized)} unrecognized, {len(redundant)} redundant")
+    return results, unrecognized, redundant
