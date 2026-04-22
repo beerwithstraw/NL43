@@ -13,7 +13,7 @@ import hashlib
 import logging
 import re
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 from config.company_registry import COMPANY_MAP
 
@@ -98,14 +98,8 @@ def _resolve_quarters(quarters_config) -> List[str]:
     return ["Q1", "Q2", "Q3", "Q4"]
 
 
-def scan(config: Dict[str, Any]) -> List[ScanResult]:
-    """
-    Walk the folder structure and return all PDFs to be processed.
 
-    Priority rule: if a company has a direct NL43/ file, it takes priority
-    over a consolidated file in the same quarter. Consolidated is ignored
-    in that case.
-    """
+def scan(config: Dict[str, Any]) -> Tuple[List[ScanResult], List[str]]:
     base_path = config.get("base_path", "").strip()
     fiscal_years = config.get("fiscal_years", [])
     quarters = _resolve_quarters(config.get("quarters", "all"))
@@ -116,6 +110,7 @@ def scan(config: Dict[str, Any]) -> List[ScanResult]:
         raise FileNotFoundError(f"base_path does not exist: {base_path}")
 
     results: List[ScanResult] = []
+    unrecognized: List[str] = []
 
     for fy in fiscal_years:
         fy_path = os.path.join(base_path, str(fy))
@@ -128,60 +123,48 @@ def scan(config: Dict[str, Any]) -> List[ScanResult]:
         for quarter in quarters:
             q_path = os.path.join(fy_path, quarter)
             if not os.path.isdir(q_path):
-                logger.debug(f"Quarter folder not found, skipping: {q_path}")
                 continue
 
-            nl39_path = os.path.join(q_path, "NL43")
-            consolidated_path = os.path.join(q_path, "Consolidated")
             direct_companies = set()
 
-            # --- Scan NL43/ subfolder: any .pdf here is a direct NL-39 form ---
-            if os.path.isdir(nl39_path):
-                for fname in os.listdir(nl39_path):
+            # --- Scan NL43/ subfolder ---
+            direct_path = os.path.join(q_path, "NL43")
+            if os.path.isdir(direct_path):
+                for fname in os.listdir(direct_path):
                     if not fname.lower().endswith(".pdf"):
                         continue
-
                     result = _extract_company_key(fname)
-                    if result is None:
-                        continue
-
-                    company_key, company_raw = result
-                    pdf_path = os.path.join(nl39_path, fname)
-
-                    results.append(ScanResult(
-                        pdf_path=os.path.abspath(pdf_path),
-                        company_key=company_key,
-                        company_raw=company_raw,
-                        quarter=quarter,
-                        fiscal_year=str(fy),
-                        year_code=year_code,
-                        source_type="direct",
-                        file_hash=_file_hash(pdf_path),
-                    ))
-                    direct_companies.add(company_key)
+                    if result:
+                        company_key, company_raw = result
+                        pdf_path = os.path.join(direct_path, fname)
+                        results.append(ScanResult(
+                            pdf_path=os.path.abspath(pdf_path),
+                            company_key=company_key,
+                            company_raw=company_raw,
+                            quarter=quarter,
+                            fiscal_year=str(fy),
+                            year_code=year_code,
+                            source_type="direct",
+                            file_hash=_file_hash(pdf_path),
+                        ))
+                        direct_companies.add(company_key)
+                    else:
+                        unrecognized.append(os.path.abspath(os.path.join(direct_path, fname)))
 
             # --- Scan Consolidated/ subfolder ---
-            # Only pick up consolidated PDFs for companies that don't have a direct NL43 file
-            if os.path.isdir(consolidated_path):
-                for fname in os.listdir(consolidated_path):
+            consol_path = os.path.join(q_path, "Consolidated")
+            if config.get("consolidated_mode", "dynamic") != "skip" and os.path.isdir(consol_path):
+                for fname in os.listdir(consol_path):
                     if not fname.lower().endswith(".pdf"):
                         continue
-
                     result = _extract_company_key(fname)
                     if result is None:
+                        unrecognized.append(os.path.abspath(os.path.join(consol_path, fname)))
                         continue
-
                     company_key, company_raw = result
-
-                    # Skip if we already have a direct file for this company
                     if company_key in direct_companies:
-                        logger.debug(
-                            f"Skipping consolidated {fname} — direct NL43 exists for {company_key}"
-                        )
                         continue
-
-                    pdf_path = os.path.join(consolidated_path, fname)
-
+                    pdf_path = os.path.join(consol_path, fname)
                     results.append(ScanResult(
                         pdf_path=os.path.abspath(pdf_path),
                         company_key=company_key,
@@ -192,11 +175,6 @@ def scan(config: Dict[str, Any]) -> List[ScanResult]:
                         source_type="consolidated",
                         file_hash=_file_hash(pdf_path),
                     ))
-                    direct_companies.add(company_key)
 
-    logger.info(
-        f"Scan complete: {len(results)} PDFs found "
-        f"({sum(1 for r in results if r.source_type == 'direct')} direct, "
-        f"{sum(1 for r in results if r.source_type == 'consolidated')} consolidated)"
-    )
-    return results
+    logger.info(f"Scan complete: {len(results)} PDFs found")
+    return results, unrecognized

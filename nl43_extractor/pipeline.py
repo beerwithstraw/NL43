@@ -103,7 +103,7 @@ def main():
     # --- Scan for PDFs ---
     logger.info("Scanning folder structure...")
     try:
-        scan_results = scan(config)
+        scan_results, unrecognized = scan(config)
     except (FileNotFoundError, ValueError) as e:
         logger.error(str(e))
         sys.exit(1)
@@ -128,10 +128,37 @@ def main():
 
     # --- Dry run ---
     if args.dry_run:
-        logger.info(f"DRY RUN — would extract {len(to_process)} files:")
+        from collections import defaultdict
+        ind_map = defaultdict(set)
+        con_map = defaultdict(set)
+        
         for r in to_process:
-            logger.info(f"  [{r.source_type:12s}] {r.company_key:30s} "
-                        f"{r.fiscal_year} {r.quarter}  {r.pdf_path}")
+            display_name = r.company_key.replace("_", " ").title()
+            if r.source_type == "direct":
+                ind_map[display_name].add(r.quarter)
+            else:
+                con_map[display_name].add(r.quarter)
+        
+        print("\n" + "="*60)
+        print("DRY RUN — Summary of files to be processed:")
+        print("="*60)
+        
+        print(f"\nINDIVIDUAL ({len(ind_map)} companies):")
+        for name in sorted(ind_map.keys()):
+            qs = ", ".join(sorted(list(ind_map[name])))
+            print(f"  - {name:25s} ({qs})")
+            
+        print(f"\nCONSOLIDATED ({len(con_map)} companies):")
+        for name in sorted(con_map.keys()):
+            qs = ", ".join(sorted(list(con_map[name])))
+            print(f"  - {name:25s} ({qs})")
+            
+        if unrecognized:
+            print(f"\nUNDETECTED FILES ({len(unrecognized)}):")
+            for path in sorted(unrecognized):
+                print(f"  [!] {os.path.basename(path)}  ({path})")
+        
+        print("\n" + "="*60)
         sys.exit(0)
 
     # --- Extract ---
