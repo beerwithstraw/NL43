@@ -39,7 +39,6 @@ def is_toc_page(text: str) -> bool:
     valid_forms = set(m for m in matches if 1 <= int(m) <= 45)
     return len(valid_forms) >= 4
 
-
 def _page_keyword_count(text: str, keywords: List[str]) -> int:
     text_upper = text.upper()
     return sum(1 for kw in keywords if kw.upper() in text_upper)

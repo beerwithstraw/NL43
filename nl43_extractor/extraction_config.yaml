@@ -39,3 +39,6 @@ nl43_page_overrides:
   CARE_HEALTH:
     start: 47
     end: 47
+  NEWINDIA:
+    start: 42
+    end: 43
