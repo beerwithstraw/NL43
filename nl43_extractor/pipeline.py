@@ -241,12 +241,11 @@ def main():
         )
         write_validation_report(all_validation_results, report_path)
 
-        if not args.force_company:
-            # 3. Validation_Summary tab
-            write_validation_summary_sheet(report_path, master_path)
+        # 3. Validation_Summary tab
+        write_validation_summary_sheet(report_path, master_path, force_company=args.force_company)
 
-            # 4. Validation_Detail tab (FAILs + WARNs)
-            write_validation_detail_sheet(report_path, master_path)
+        # 4. Validation_Detail tab (FAILs + WARNs)
+        write_validation_detail_sheet(report_path, master_path, force_company=args.force_company)
 
         logger.info(f"Validation report: {report_path}")
 

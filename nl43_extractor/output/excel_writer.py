@@ -322,7 +322,7 @@ def save_workbook(extractions: List[CompanyExtract], output_path: str,
     logger.info(f"Excel workbook saved to {output_path}")
 
 
-def write_validation_summary_sheet(report_path: str, master_path: str):
+def write_validation_summary_sheet(report_path: str, master_path: str, force_company: str = None):
     import pandas as pd
     df = pd.read_csv(report_path)
     summary = df.pivot_table(
@@ -336,11 +336,19 @@ def write_validation_summary_sheet(report_path: str, master_path: str):
     summary = summary.rename(columns={"company": "Company", "quarter": "Quarter", "year": "Year"})
     cols = ["Company", "Quarter", "Year", "Total_Checks", "PASS", "SKIP", "WARN", "FAIL"]
     summary = summary[cols]
+    if force_company:
+        try:
+            existing = pd.read_excel(master_path, sheet_name="Validation_Summary")
+            companies_in_new = set(summary["Company"].unique())
+            existing = existing[~existing["Company"].isin(companies_in_new)]
+            summary = pd.concat([existing, summary], ignore_index=True)
+        except Exception:
+            pass
     with pd.ExcelWriter(master_path, mode="a", engine="openpyxl", if_sheet_exists="replace") as w:
         summary.to_excel(w, sheet_name="Validation_Summary", index=False)
 
 
-def write_validation_detail_sheet(report_path: str, master_path: str):
+def write_validation_detail_sheet(report_path: str, master_path: str, force_company: str = None):
     import pandas as pd
     from openpyxl import load_workbook
     from openpyxl.styles import PatternFill
@@ -359,6 +367,15 @@ def write_validation_detail_sheet(report_path: str, master_path: str):
         detail = detail.rename(columns=cols_map)[list(cols_map.values())]
         detail = detail.sort_values("Status").reset_index(drop=True)
 
+    if force_company:
+        try:
+            run_companies = set(pd.read_csv(report_path)["company"].unique())
+            existing_detail = pd.read_excel(master_path, sheet_name="Validation_Detail")
+            if "Company" in existing_detail.columns:
+                existing_detail = existing_detail[~existing_detail["Company"].isin(run_companies)]
+            detail = pd.concat([existing_detail, detail], ignore_index=True)
+        except Exception:
+            pass
     with pd.ExcelWriter(master_path, mode="a", engine="openpyxl", if_sheet_exists="replace") as w:
         detail.to_excel(w, sheet_name="Validation_Detail", index=False)
 

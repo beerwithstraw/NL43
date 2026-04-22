@@ -36,6 +36,6 @@ nl43_keyword_min_matches: 3
 # min_matches: raise threshold to skip TOC pages that already match the global minimum.
 # start/end: hard 1-indexed page override (bypasses keyword detection entirely).
 nl43_page_overrides:
-  care_health:
-    min_matches: 2   # NL-43 page omits "RURAL & SOCIAL" phrase; only NL-43 + SUM ASSURED visible
-  IFFCO_TOKIO: {"start": 81, "end": 81}
+  CARE_HEALTH:
+    start: 47
+    end: 47

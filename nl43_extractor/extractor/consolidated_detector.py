@@ -28,11 +28,16 @@ DEFAULT_KEYWORDS = [
 # TOC pages match at most 2 keywords; the real form page matches 3+.
 DEFAULT_MIN_MATCHES = 3
 
-FORM_HEADER_PATTERN = re.compile(r"FORM\s+NL[-\s]?(\d+)", re.IGNORECASE)
-TOC_SKIP_PATTERN = re.compile(
-    r"TABLE\s+OF\s+CONTENTS|FORM\s+INDEX|INDEX\s+OF\s+FORMS",
-    re.IGNORECASE,
+FORM_HEADER_PATTERN = re.compile(
+    r"^\s*(?:FORM\s+)?NL[-\s]?(\d+)|\bFORM\s+NL[-\s]?(\d+)", 
+    re.IGNORECASE | re.MULTILINE
 )
+def is_toc_page(text: str) -> bool:
+    if re.search(r"TABLE\s+OF\s+CONTENTS|FORM\s+INDEX|INDEX\s+OF\s+FORMS", text, re.IGNORECASE):
+        return True
+    matches = re.findall(r"\bNL[-\s]?(\d+)\b", text, re.IGNORECASE)
+    valid_forms = set(m for m in matches if 1 <= int(m) <= 45)
+    return len(valid_forms) >= 4
 
 
 def _page_keyword_count(text: str, keywords: List[str]) -> int:
@@ -66,7 +71,7 @@ def find_nl43_pages(
         # Find start page
         start_page = None
         for i, text in enumerate(page_texts):
-            if TOC_SKIP_PATTERN.search(text):
+            if is_toc_page(text):
                 logger.debug(f"  page {i + 1}: TOC page, skipping")
                 continue
             if _page_keyword_count(text, keywords) >= min_matches:
