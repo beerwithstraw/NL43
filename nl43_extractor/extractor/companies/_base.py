@@ -11,22 +11,22 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_nl39_pages(pdf) -> list:
+def get_nl43_pages(pdf) -> list:
     """
     Return only the pages that belong to FORM NL-43.
 
-    For standalone NL-43 PDFs (always 2 pages) this returns all pages.
+    For standalone NL-43 PDFs this returns all pages.
     For consolidated PDFs, filters pages containing NL-43 keywords.
     """
-    keywords = {"nl-39", "nl 39", "ageing of claims", "ageing of claim"}
+    keywords = {"nl-43", "nl 43", "rural & social", "sum assured"}
     all_pages = pdf.pages
     if len(all_pages) <= 2:
         return list(all_pages)
 
-    nl39_pages = []
+    nl43_pages = []
     for page in all_pages:
         text = (page.extract_text() or "").lower()
         if any(kw in text for kw in keywords):
-            nl39_pages.append(page)
+            nl43_pages.append(page)
 
-    return nl39_pages if nl39_pages else list(all_pages)
+    return nl43_pages if nl43_pages else list(all_pages)
