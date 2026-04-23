@@ -24,7 +24,7 @@ class CompanyExtract:
     source_file: str
     company_key: str                # e.g. "bajaj_allianz"
     company_name: str               # e.g. "Bajaj Allianz General Insurance"
-    form_type: str                  # "NL39"
+    form_type: str                  # "NL43"
     quarter: str                    # e.g. "Q1"
     year: str                       # e.g. "202526"
     current_year: Optional[PeriodData] = None

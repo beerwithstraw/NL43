@@ -1,5 +1,5 @@
 """
-CLI entry point for the NL4 Batch Premium Extractor.
+CLI entry point for the NL43 Batch Premium Extractor.
 
 Source: approach document Section 6
 """
@@ -39,7 +39,7 @@ console = Console()
 
 @click.group()
 def cli():
-    """NL4 Batch Premium Extractor CLI."""
+    """NL43 Batch Premium Extractor CLI."""
     pass
 
 
@@ -187,7 +187,7 @@ def extract(input_dir, manifest_csv, output_dir, auto, year_selection):
         write_validation_report(val_results, str(report_path))
         
         # 4. Save Excel
-        excel_path = output_path / "NL4_Master.xlsx"
+        excel_path = output_path / "NL43_Master.xlsx"
         save_workbook(extractions, str(excel_path), stats=stats, year_selection=year_selection)
         
         # 5. Append Validation Sheets

@@ -51,8 +51,8 @@ def _extract_company_key(filename: str) -> Optional[tuple]:
     Extract company key from any PDF filename by splitting on '_' and
     trying progressively longer suffixes against COMPANY_MAP.
 
-    E.g. 'NL4_2024_25_Q1_BajajGeneral.pdf' -> splits to
-    ['NL4', '2024', '25', 'Q1', 'BajajGeneral'] -> tries 'BajajGeneral',
+    E.g. 'NL43_2024_25_Q1_BajajGeneral.pdf' -> splits to
+    ['NL43', '2024', '25', 'Q1', 'BajajGeneral'] -> tries 'BajajGeneral',
     then 'Q1BajajGeneral', etc. until COMPANY_MAP match.
 
     Returns (company_key, company_raw) or None if not found.

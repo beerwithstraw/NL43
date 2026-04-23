@@ -160,7 +160,7 @@ COMPANY_DISPLAY_NAMES = {
 }
 
 # ---------------------------------------------------------------------------
-# Dedicated parser function name (empty = use generic NL-39 parser for all)
+# Dedicated parser function name (empty = use generic NL-43 parser for all)
 # Add entries here as company-specific quirks are discovered.
 # ---------------------------------------------------------------------------
 DEDICATED_PARSER: dict = {

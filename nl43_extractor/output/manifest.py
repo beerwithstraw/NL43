@@ -51,14 +51,14 @@ def generate_manifest(input_dir: Union[str, Path], output_csv: Union[str, Path])
         form, company, quarter, year = detect_all(pdf)
         confidence = compute_confidence(form, company, quarter, year)
         
-        # Proposed name: NL4_Q1_202526_Company.pdf
+        # Proposed name: NL43_Q1_202526_Company.pdf
         if confidence in ("HIGH", "MEDIUM") and company:
             proposed_name = get_proposed_name(company, quarter, year)
         else:
             proposed_name = "-"
 
         # Action logic
-        action = "uncategorised" if (form != "NL4" or confidence == "UNKNOWN") else "proceed"
+        action = "uncategorised" if (form != "NL43" or confidence == "UNKNOWN") else "proceed"
 
         rows.append({
             "filename": pdf.name,

@@ -1,5 +1,5 @@
 """
-Cell normalisation functions for NL-4 PDF extraction.
+Cell normalisation functions for NL-43 PDF extraction.
 
 clean_number()   — converts any raw cell value to Python float or None
 normalise_text() — normalises a row/column label for fuzzy matching
@@ -11,7 +11,7 @@ Anti-hallucination rule #1: never invent values — return None on failure.
 import re
 
 
-# Strings that represent "no value" in NL-4 PDFs
+# Strings that represent "no value" in NL-43 PDFs
 NIL_STRINGS = frozenset({
     "-", "--", "- -", "–", "—",      # ASCII dash, double-dash, en-dash, em-dash
     "n/a", "na", "nil",

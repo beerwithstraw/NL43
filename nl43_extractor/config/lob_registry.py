@@ -1,7 +1,7 @@
 """
 LOB (Line of Business) Registry for NL-43 (Rural & Social Obligations).
 
-LOBs appear as row labels in the PDF table (col 1), same orientation as NL-39.
+LOBs appear as row labels in the PDF table (col 1), same orientation as NL-43.
 NL-43 has 14 LOB rows + 1 total row.
 """
 

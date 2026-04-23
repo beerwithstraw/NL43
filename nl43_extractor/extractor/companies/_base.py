@@ -1,5 +1,5 @@
 """
-Shared base utilities for NL-39 dedicated parsers.
+Shared base utilities for NL-43 dedicated parsers.
 
 The generic parser in extractor/parser.py handles all companies by default.
 This module provides helpers for dedicated parsers when company-specific
@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 def get_nl39_pages(pdf) -> list:
     """
-    Return only the pages that belong to FORM NL-39.
+    Return only the pages that belong to FORM NL-43.
 
-    For standalone NL-39 PDFs (always 2 pages) this returns all pages.
-    For consolidated PDFs, filters pages containing NL-39 keywords.
+    For standalone NL-43 PDFs (always 2 pages) this returns all pages.
+    For consolidated PDFs, filters pages containing NL-43 keywords.
     """
     keywords = {"nl-39", "nl 39", "ageing of claims", "ageing of claim"}
     all_pages = pdf.pages
