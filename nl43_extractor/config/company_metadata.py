@@ -13,7 +13,7 @@ COMPANY_METADATA = {
         "company_name": "BGIL",
         "sorted_company": "00-BGIL",
         "sector": "Private Sector Insurers",
-        "competitors": "BAGIC",
+        "competitors": "BGIL",
     },
     "icici_lombard": {
         "company_name": "ICICILombard",

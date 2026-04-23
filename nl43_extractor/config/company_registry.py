@@ -111,6 +111,7 @@ COMPANY_MAP = {
     "tata aig": "tata_aig",
     "tataaig": "tata_aig",
     "united india": "united_india",
+    "united": "united_india",
     "unitedindia": "united_india",
     "universal sompo": "universal_sompo",
     "universalsompo": "universal_sompo",
